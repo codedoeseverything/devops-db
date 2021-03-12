@@ -205,9 +205,9 @@ Resources:
       Parameters:
         StackName: !Ref 'StackName'
         Env: !Ref 'Env'
-        DBSnapshotIdentifier: !Ref 'Env'
-        DBName: !Ref 'Env'
-        DBBackupRetentionPeriod: !Ref 'DBSnapshotIdentifier'
+        DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
+        DBName: !Ref 'DBName'
+        DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
         DBMasterUsername: !Ref 'DBMasterUsername'
         DBMasterUserPassword: !Ref 'DBMasterUserPassword'
         SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
