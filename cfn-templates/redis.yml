@@ -182,7 +182,7 @@ Resources:
       NotificationTopicArn: {'Fn::ImportValue': !Sub '${StackName}-ChatBotSNSTopicARN-${Env}'}
       NumNodeGroups: !Ref NumShards
       ReplicasPerNodeGroup: !Ref NumReplicas
-      PreferredMaintenanceWindow: 'sat:21:00-sat:23:00'
+      PreferredMaintenanceWindow: 'sat:02:00-sat:03:00'
       SecurityGroupIds:
       - {'Fn::ImportValue': !Sub '${StackName}-CacheClientSecurityGroup-${Env}'}
       - {'Fn::ImportValue': !Sub '${StackName}-CacheServerSecurityGroup-${Env}'}
