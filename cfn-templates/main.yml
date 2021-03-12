@@ -108,6 +108,72 @@ Parameters:
     Default: 90
     MinValue: -1
     MaxValue: 100
+  DBSnapshotIdentifier:
+    Description: 'Optional identifier for the DB cluster snapshot from which you want to restore (leave blank to create an empty cluster).'
+    Type: String
+    Default: ''
+  DBName:
+    Description: 'Name of the database (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
+    Type: String
+    Default: ''
+  DBBackupRetentionPeriod:
+    Description: 'The number of days to keep snapshots of the cluster.'
+    Type: Number
+    MinValue: 1
+    MaxValue: 35
+    Default: 30
+  DBMasterUsername:
+    Description: 'The master user name for the DB instance (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
+    Type: 'String'
+    Default: master
+  DBMasterUserPassword:
+    Description: 'The master password for the DB instance (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
+    Type: String
+    NoEcho: true
+    Default: ''
+  SubDomainNameWithDot:
+    Description: 'Name that is used to create the DNS entry with trailing dot, e.g. §{SubDomainNameWithDot}§{HostedZoneName}. Leave blank for naked (or apex and bare) domain. Requires ParentZoneStack parameter!'
+    Type: String
+    Default: 'aurora.'
+  PreferredBackupWindow:
+    Description: 'IGNORED BECAUSE OF A BUG IN CLOUDFORMATION! VALUE WILL APPLY IN THE FUTURE! The daily time range in UTC during which you want to create automated backups.' # TODO remove uppercase warning
+    Type: String
+    Default: '09:54-10:24'
+  PreferredMaintenanceWindow:
+    Description: 'IGNORED BECAUSE OF A BUG IN CLOUDFORMATION! VALUE WILL APPLY IN THE FUTURE! The weekly time range (in UTC) during which system maintenance can occur.' # TODO remove uppercase warning
+    Type: String
+    Default: 'sat:07:00-sat:07:30'
+  EnableDataApi:
+    Description: 'Enable the Data API (https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html).'
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'false'
+  AutoPause:
+    Description: 'Enable automatic pause for a Serverless Aurora cluster. A cluster can be paused only when it has no connections. If a cluster is paused for more than seven days, the cluster might be backed up with a snapshot. In this case, the cluster is restored when there is a request to connect to it.'
+    Type: String
+    AllowedValues: ['true', 'false']
+    Default: 'true'
+  MaxCapacity:
+    Description: 'The maximum capacity units for a Serverless Aurora cluster.'
+    Type: String
+    AllowedValues: [2, 4, 8, 16, 32, 64, 192, 384]
+    Default: 2
+  MinCapacity:
+    Description: 'The minimum capacity units for a Serverless Aurora cluster.'
+    Type: String
+    AllowedValues: [2, 4, 8, 16, 32, 64, 192, 384]
+    Default: 2
+  SecondsUntilAutoPause:
+    Description: 'The time, in seconds, before a Serverless Aurora cluster is paused.'
+    Type: Number
+    MinValue: 1
+    MaxValue: 86400
+    Default: 300
+  EngineVersion:
+    Description: 'Aurora Serverless PostgreSQL version.'
+    Type: String
+    Default: '10.7'
+    AllowedValues: ['10.7','10.12'] # aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`serverless`)]'
 
 
 Resources:
@@ -130,3 +196,23 @@ Resources:
         NumReplicas: !Ref 'NumReplicas'
         CPUUtilizationThreshold: !Ref 'CPUUtilizationThreshold'
         DatabaseMemoryUsagePercentageThreshold: !Ref 'DatabaseMemoryUsagePercentageThreshold'
+
+  AuroraServerlessPostgresStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/cfn-templates/aurora-serverless-postgres.yml'
+      Parameters:
+        StackName: !Ref 'StackName'
+        Env: !Ref 'Env'
+        DBSnapshotIdentifier: !Ref 'Env'
+        DBName: !Ref 'Env'
+        DBBackupRetentionPeriod: !Ref 'DBSnapshotIdentifier'
+        DBMasterUsername: !Ref 'DBMasterUsername'
+        DBMasterUserPassword: !Ref 'DBMasterUserPassword'
+        SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
+        EnableDataApi: !Ref 'EnableDataApi'
+        AutoPause: !Ref 'AutoPause'
+        MaxCapacity: !Ref 'MaxCapacity'
+        MinCapacity: !Ref 'MinCapacity'
+        SecondsUntilAutoPause: !Ref 'SecondsUntilAutoPause'
+        EngineVersion: !Ref 'EngineVersion'

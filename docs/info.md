@@ -10,3 +10,6 @@ aws s3api list-buckets --query Owner.ID --output text --profile p2
 https://aws.amazon.com/blogs/mt/git-pre-commit-validation-of-aws-cloudformation-templates-with-cfn-lint/
 
 4. AWS ElasticCache Redis has no autoscaling option. 
+
+5. Aurora RDS Engine-
+aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`serverless`)]'

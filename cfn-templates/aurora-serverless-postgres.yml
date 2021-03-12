@@ -29,28 +29,6 @@ Parameters:
       - stage
       - live
     ConstraintDescription: must specify sandbox,stage,live.
-  ParentVPCStack:
-    Description: 'Stack name of parent VPC stack based on vpc/vpc-*azs.yaml template.'
-    Type: String
-  ParentClientStack:
-    Description: 'Stack name of parent client stack based on state/client-sg.yaml template.'
-    Type: String
-  ParentKmsKeyStack:
-    Description: 'Stack name of parent KMS key stack based on security/kms-key.yaml template (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: String
-    Default: ''
-  ParentZoneStack:
-    Description: 'Optional stack name of parent zone stack based on vpc/vpc-zone-*.yaml template.'
-    Type: String
-    Default: ''
-  ParentSSHBastionStack:
-    Description: 'Optional but recommended stack name of parent SSH bastion host/instance stack based on vpc/vpc-*-bastion.yaml template.'
-    Type: String
-    Default: ''
-  ParentAlertStack:
-    Description: 'Optional but recommended stack name of parent alert stack based on operations/alert.yaml template.'
-    Type: String
-    Default: ''
   DBSnapshotIdentifier:
     Description: 'Optional identifier for the DB cluster snapshot from which you want to restore (leave blank to create an empty cluster).'
     Type: String
@@ -116,59 +94,40 @@ Parameters:
     Description: 'Aurora Serverless PostgreSQL version.'
     Type: String
     Default: '10.7'
-    AllowedValues: ['10.7'] # aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`serverless`)]'
+    AllowedValues: ['10.7','10.12'] # aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`serverless`)]'
 Mappings:
   EngineVersionMap:
     '10.7':
       ClusterParameterGroupFamily: 'aurora-postgresql10'
+    '10.12':
+      ClusterParameterGroupFamily: 'aurora-postgresql10'
 Conditions:
-  HasZone: !Not [!Equals [!Ref ParentZoneStack, '']]
-  HasSSHBastionSecurityGroup: !Not [!Equals [!Ref ParentSSHBastionStack, '']]
-  HasAlertTopic: !Not [!Equals [!Ref ParentAlertStack, '']]
   HasNotDBSnapshotIdentifier: !Equals [!Ref DBSnapshotIdentifier, '']
   HasDBSnapshotIdentifier: !Not [!Condition HasNotDBSnapshotIdentifier]
 Resources:
-  RecordSet:
-    Condition: HasZone
-    Type: 'AWS::Route53::RecordSet'
-    Properties:
-      HostedZoneId: {'Fn::ImportValue': !Sub '${ParentZoneStack}-HostedZoneId'}
-      Name: !Sub
-      - '${SubDomainNameWithDot}${HostedZoneName}'
-      - SubDomainNameWithDot: !Ref SubDomainNameWithDot
-        HostedZoneName: {'Fn::ImportValue': !Sub '${ParentZoneStack}-HostedZoneName'}
-      ResourceRecords:
-      - !GetAtt 'DBCluster.Endpoint.Address'
-      TTL: 60
-      Type: CNAME
-  ClusterSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    Properties:
-      GroupDescription: !Ref 'AWS::StackName'
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 5432
-        ToPort: 5432
-        SourceSecurityGroupId: {'Fn::ImportValue': !Sub '${ParentClientStack}-ClientSecurityGroup'}
-      VpcId: {'Fn::ImportValue': !Sub '${ParentVPCStack}-VPC'}
-  ClusterSecurityGroupInSSHBastion:
-    Type: 'AWS::EC2::SecurityGroupIngress'
-    Condition: HasSSHBastionSecurityGroup
-    Properties:
-      GroupId: !Ref ClusterSecurityGroup
-      IpProtocol: tcp
-      FromPort: 5432
-      ToPort: 5432
-      SourceSecurityGroupId: {'Fn::ImportValue': !Sub '${ParentSSHBastionStack}-SecurityGroup'}
+  # RecordSet:
+  #   Type: 'AWS::Route53::RecordSet'
+  #   Properties:
+  #     HostedZoneId: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneId-${Env}'}
+  #     Name: !Sub
+  #     - '${SubDomainNameWithDot}${HostedZoneName}'
+  #     - SubDomainNameWithDot: !Ref SubDomainNameWithDot
+  #       HostedZoneName: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneName-${Env}'}
+  #     ResourceRecords:
+  #     - !GetAtt 'DBCluster.Endpoint.Address'
+  #     TTL: 60
+  #     Type: CNAME
   DBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
     Properties:
-      DBSubnetGroupDescription: !Ref 'AWS::StackName'
-      SubnetIds: !Split [',', {'Fn::ImportValue': !Sub '${ParentVPCStack}-SubnetsPrivate'}]
+      DBSubnetGroupDescription: !Sub '${StackName}-AuroraServerlessPostgresDBSubnetGroup-${Env}'
+      SubnetIds: !Split
+      - ','
+      - 'Fn::ImportValue': !Sub '${StackName}-SubnetsPrivate-${Env}'
   DBClusterParameterGroup:
     Type: 'AWS::RDS::DBClusterParameterGroup'
     Properties:
-      Description: !Ref 'AWS::StackName'
+      Description: !Sub '${StackName}-AuroraServerlessPostgresDBClusterParameterGroup-${Env}'
       Family: !FindInMap [EngineVersionMap, !Ref EngineVersion, ClusterParameterGroupFamily]
       Parameters:
         client_encoding: 'UTF8'
@@ -185,7 +144,6 @@ Resources:
       Engine: aurora-postgresql
       EngineMode: serverless
       EngineVersion: !Ref EngineVersion
-      KmsKeyId: !If [HasDBSnapshotIdentifier, !Ref 'AWS::NoValue', {'Fn::ImportValue': !Sub '${ParentKmsKeyStack}-KeyArn'}]
       MasterUsername: !If [HasDBSnapshotIdentifier, !Ref 'AWS::NoValue', !Ref DBMasterUsername]
       MasterUserPassword: !If [HasDBSnapshotIdentifier, !Ref 'AWS::NoValue', !Ref DBMasterUserPassword]
       # PreferredBackupWindow: !Ref PreferredBackupWindow TODO re-enable as soon as CloudFormation bug ix fixed
@@ -198,25 +156,19 @@ Resources:
       SnapshotIdentifier: !If [HasDBSnapshotIdentifier, !Ref DBSnapshotIdentifier, !Ref 'AWS::NoValue']
       StorageEncrypted: true
       VpcSecurityGroupIds:
-      - !Ref ClusterSecurityGroup
+      - {'Fn::ImportValue': !Sub '${StackName}-DBClientSecurityGroup-${Env}'}
+      - {'Fn::ImportValue': !Sub '${StackName}-DBServerSecurityGroup-${Env}'}
   DatabaseClusterEventSubscription:
-    Condition: HasAlertTopic
     Type: 'AWS::RDS::EventSubscription'
     Properties:
       EventCategories:
       - failover
       - failure
       - maintenance
-      SnsTopicArn: {'Fn::ImportValue': !Sub '${ParentAlertStack}-TopicARN'}
+      SnsTopicArn: {'Fn::ImportValue': !Sub '${StackName}-ChatBotSNSTopicARN-${Env}'}
       SourceIds: [!Ref DBCluster]
       SourceType: 'db-cluster'
 Outputs:
-  TemplateID:
-    Description: 'cloudonaut.io template id.'
-    Value: 'state/rds-aurora-serverless-postgres'
-  TemplateVersion:
-    Description: 'cloudonaut.io template version.'
-    Value: '__VERSION__'
   StackName:
     Description: 'Stack name.'
     Value: !Sub '${AWS::StackName}'
@@ -224,14 +176,9 @@ Outputs:
     Description: 'The name of the cluster.'
     Value: !Ref DBCluster
     Export:
-      Name: !Sub '${AWS::StackName}-ClusterName'
+      Name: !Sub '${StackName}-AuroraServerlessPostgresClusterName-${Env}'
   DNSName:
     Description: 'The connection endpoint for the DB cluster.'
     Value: !GetAtt 'DBCluster.Endpoint.Address'
     Export:
-      Name: !Sub '${AWS::StackName}-DNSName'
-  SecurityGroupId:
-    Description: 'The security group used to manage access to RDS Aurora Serverless Postgres.'
-    Value: !Ref ClusterSecurityGroup
-    Export:
-      Name: !Sub '${AWS::StackName}-SecurityGroupId'
+      Name: !Sub '${StackName}-AuroraServerlessPostgresDNSName-${Env}'
