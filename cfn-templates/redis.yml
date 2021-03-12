@@ -170,6 +170,7 @@ Resources:
         - Key: Name
           Value: !Sub '${StackName}-RedisElastiCacheCluster-${Env}'
       ReplicationGroupDescription: !Sub '${StackName}-RedisReplicationGroup-${Env}'
+      ReplicationGroupId: !Sub '${StackName}-RedisElastiCacheCluster-${Env}'
       AtRestEncryptionEnabled: true
       AuthToken: !If [HasAuthToken, !Ref AuthToken, !Ref 'AWS::NoValue']
       AutomaticFailoverEnabled: !If [HasAutomaticFailoverEnabled, true, false]
