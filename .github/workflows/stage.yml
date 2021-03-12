@@ -76,7 +76,7 @@ jobs:
           Env=${{ env.ENV }}
           CFNS3BucketName=${{ env.CFNS3BucketName }}
           CFNS3BucketRegion=ap-southeast-2
-          DBName=${{ env.STACK_NAME }}-aurora-serverless-postgres-${{ env.ENV }}
+          DBName=${{ env.STACK_NAME }}auroraserverlesspostgres${{ env.ENV }}
 
           EOF
 
