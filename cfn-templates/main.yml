@@ -41,7 +41,7 @@ Parameters:
       - stage
       - live
     ConstraintDescription: must specify sandbox,stage,live.
-  EngineVersion:
+  RedisEngineVersion:
     Description: 'Redis version'
     Type: String
     Default: '6.x'
@@ -169,7 +169,7 @@ Parameters:
     MinValue: 1
     MaxValue: 86400
     Default: 300
-  EngineVersion:
+  AuroraEngineVersion:
     Description: 'Aurora Serverless PostgreSQL version.'
     Type: String
     Default: '10.7'
@@ -185,7 +185,7 @@ Resources:
       Parameters:
         StackName: !Ref 'StackName'
         Env: !Ref 'Env'
-        EngineVersion: !Ref 'EngineVersion'
+        EngineVersion: !Ref 'RedisEngineVersion'
         CacheNodeType: !Ref 'CacheNodeType'
         TransitEncryption: !Ref 'TransitEncryption'
         AuthToken: !Ref 'AuthToken'
@@ -215,4 +215,4 @@ Resources:
         MaxCapacity: !Ref 'MaxCapacity'
         MinCapacity: !Ref 'MinCapacity'
         SecondsUntilAutoPause: !Ref 'SecondsUntilAutoPause'
-        EngineVersion: !Ref 'EngineVersion'
+        EngineVersion: !Ref 'AuroraEngineVersion'

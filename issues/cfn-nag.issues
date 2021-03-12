@@ -1,22 +1,10 @@
 [
   {
-    "filename": "cfn-templates/aurora-serverless-postgres.yml.md",
+    "filename": "cfn-templates/aurora-serverless-postgres.yml",
     "file_results": {
       "failure_count": 0,
       "violations": [
-        {
-          "id": "W36",
-          "type": "WARN",
-          "message": "Security group rules without a description obscure their purpose and may lead to bad practices in ensuring they only allow traffic from the ports and sources/destinations required.",
-          "logical_resource_ids": [
-            "ClusterSecurityGroup",
-            "ClusterSecurityGroupInSSHBastion"
-          ],
-          "line_numbers": [
-            145,
-            155
-          ]
-        }
+
       ]
     }
   },

@@ -1,4 +1,4 @@
-EngineVersion=6.x
+RedisEngineVersion=6.x
 CacheNodeType=cache.t2.micro
 TransitEncryption=true
 AuthToken=
@@ -19,4 +19,4 @@ AutoPause=true
 MaxCapacity=2
 MinCapacity=2
 SecondsUntilAutoPause=600
-EngineVersion=10.12
+AuroraEngineVersion=10.12
