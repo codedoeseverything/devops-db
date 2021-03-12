@@ -40,7 +40,7 @@ Parameters:
   DBBackupRetentionPeriod:
     Description: 'The number of days to keep snapshots of the cluster.'
     Type: Number
-    MinValue: 0
+    MinValue: 1
     MaxValue: 35
     Default: 30
   DBMasterUsername:
