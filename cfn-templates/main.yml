@@ -1,0 +1,132 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This is master cloudformation template for core Practera DB infrastructure
+  design
+
+Metadata:
+  Authors:
+    Description: Sunil and Mihai (sunil@practera.com/mihai@practera.com) based on
+      AWS quickstart/widdix and best practise.
+  License:
+    Description: Copyright 2020 Intersective PTY LTD and its affiliates. All Rights
+      Reserved.
+
+Parameters:
+
+  CFNS3BucketName:
+    Description: S3 bucket name for the Cloudformation template stored. This string
+      can include numbers, lowercase letters, uppercase letters, and hyphens (-).
+      It cannot start or end with a hyphen (-).
+    Default: devops-cfn-templates
+    Type: String
+  CFNS3BucketRegion:
+    Default: ap-southeast-2
+    Description: The AWS Region where the Cloudformation template stored in S3 bucket
+      is hosted. When using your own bucket, you must specify this value.
+    Type: String
+  StackName:
+    ConstraintDescription: This will be unique string to represent our stack.
+    Default: beta
+    Description: A client/project/product unique name for the stack to idnetify later.
+      This string can include numbers, lowercase letters, uppercase letters, and hyphens
+      (-). It cannot start or end with a hyphen (-).
+    Type: String
+    AllowedValues: [au,us,uk,p2,lf,nu,alpha,beta,shared]
+  Env:
+    Description: Environment type.
+    Default: stage
+    Type: String
+    AllowedValues:
+      - sandbox
+      - stage
+      - live
+    ConstraintDescription: must specify sandbox,stage,live.
+  EngineVersion:
+    Description: 'Redis version'
+    Type: String
+    Default: '6.x'
+    AllowedValues: # aws elasticache describe-cache-engine-versions --engine redis --query "CacheEngineVersions[].EngineVersion"
+    - '3.2.6' # 3.2.4 and 3.2.10 do not support encryption
+    - '4.0.10'
+    - '5.0.0'
+    - '5.0.3'
+    - '5.0.4'
+    - '5.0.5'
+    - '5.0.6'
+    - '6.x'
+  CacheNodeType:
+    Description: 'The compute and memory capacity of the nodes in the node group (shard).'
+    Type: 'String'
+    Default: 'cache.t2.micro'
+  TransitEncryption:
+    Description: 'Enable encryption for data in transit? (see https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/in-transit-encryption.html)'
+    Type: 'String'
+    Default: 'true'
+    AllowedValues:
+    - 'true'
+    - 'false'
+  AuthToken:
+    Description: 'Optional password (16 to 128 characters) used to authenticate against Redis (requires TransitEncryption := true; leave blank to disable password-protection).'
+    Type: 'String'
+    Default: ''
+    MaxLength: 128
+  SnapshotRetentionLimit:
+    Description: 'The number of days for which ElastiCache retains automatic snapshots before deleting them (set to 0 to disable backups).'
+    Type: Number
+    Default: 35
+    MinValue: 0
+    MaxValue: 35
+  SnapshotName:
+    Description: 'Optional name of a snapshot from which you want to restore (leave blank to create an empty cache).'
+    Type: 'String'
+    Default: ''
+  SubDomainName:
+    Description: 'Name that is used to create the DNS entry §{SubDomainName}.§{HostedZoneName} (required when ParentZoneStack is set, otherwise not considered)'
+    Type: String
+    Default: redis
+  NumShards:
+    Description: 'Number of shards in the cluster.'
+    Type: 'Number'
+    Default: 1
+    MinValue: 1
+    MaxValue: 250
+  NumReplicas:
+    Description: 'Number of replicas per shard.'
+    Type: 'Number'
+    Default: 1
+    MinValue: 0
+    MaxValue: 5
+  CPUUtilizationThreshold:
+    Description: 'The maximum percentage of CPU usage (set to -1 to disable).'
+    Type: Number
+    Default: 80
+    MinValue: -1
+    MaxValue: 100
+  DatabaseMemoryUsagePercentageThreshold:
+    Description: 'The maximum percentage of memory usage (set to -1 to disable).'
+    Type: Number
+    Default: 90
+    MinValue: -1
+    MaxValue: 100
+
+
+Resources:
+
+  RedisStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/cfn-templates/redis.yml'
+      Parameters:
+        StackName: !Ref 'StackName'
+        Env: !Ref 'Env'
+        EngineVersion: !Ref 'EngineVersion'
+        CacheNodeType: !Ref 'CacheNodeType'
+        TransitEncryption: !Ref 'TransitEncryption'
+        AuthToken: !Ref 'AuthToken'
+        SnapshotRetentionLimit: !Ref 'SnapshotRetentionLimit'
+        SnapshotName: !Ref 'SnapshotName'
+        SubDomainName: !Ref 'SubDomainName'
+        NumShards: !Ref 'NumShards'
+        NumReplicas: !Ref 'NumReplicas'
+        CPUUtilizationThreshold: !Ref 'CPUUtilizationThreshold'
+        DatabaseMemoryUsagePercentageThreshold: !Ref 'DatabaseMemoryUsagePercentageThreshold'

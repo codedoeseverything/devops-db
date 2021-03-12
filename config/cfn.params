@@ -1,0 +1,11 @@
+EngineVersion=6.x
+CacheNodeType=cache.t2.micro
+TransitEncryption=true
+AuthToken=
+SnapshotRetentionLimit=0
+SnapshotName=
+SubDomainName=redis
+NumShards=1
+NumReplicas=1
+CPUUtilizationThreshold=70
+DatabaseMemoryUsagePercentageThreshold=70
