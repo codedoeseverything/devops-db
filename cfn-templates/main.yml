@@ -206,7 +206,7 @@ Resources:
         StackName: !Ref 'StackName'
         Env: !Ref 'Env'
         DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
-        DBName: !Ref 'DBName'
+        DBName: !Ref 'DBName' # beta-devops-db-stage-auroraserverlesspo-dbcluster-1gjgqjwgbbcab
         DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
         DBMasterUsername: !Ref 'DBMasterUsername'
         DBMasterUserPassword: !Ref 'DBMasterUserPassword'

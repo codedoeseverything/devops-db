@@ -110,7 +110,7 @@ jobs:
           aws s3 sync cfn-templates/ s3://${{env.CFNS3BucketName}}/${{env.STACK_NAME}}/cfn-templates --delete
 
 
-      - name: Create or Update cloudformation templates to AWS
+      - name: Create or Update cloudformation templates from ${{ env.STACK_NAME }} AWS account in ${{ env.REGION }} region
         run: |
           python3 scripts/cfn-create-update.py ${{ env.STACK_NAME }}-${{ env.SUBDOMAIN }}-${{env.ENV}} cfn-templates/main.yml config/cfn-params.json config/cfn-tags.json
        
