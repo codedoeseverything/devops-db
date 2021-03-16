@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     #Global Env variables declare here
+    
     env:
       REGION :  ap-southeast-2
       ENV : stage # Valid values are sandbox,stage,live only
