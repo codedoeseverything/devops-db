@@ -73,7 +73,7 @@ jobs:
       - name: Extract cloudformation export variables 
         run: |
           export DBARN=${{ env.STACK_NAME }}-DB-${{ env.ENV }}
-          echo "DBSECRETARN="$(aws cloudformation list-exports --query "Exports[?Name==\`$DBSECRETARN\`].Value" --no-paginate --output text) >> $GITHUB_ENV
+          echo "DBSecretARN="$(aws cloudformation list-exports --query "Exports[?Name==\`$DBARN\`].Value" --no-paginate --output text) >> config/cfn.params
 
 
       - name: Create additional cloudformation parameters for stack deployment
@@ -84,9 +84,9 @@ jobs:
           CFNS3BucketName=${{ env.CFNS3BucketName }}
           CFNS3BucketRegion=ap-southeast-2
           DBName=${{ env.STACK_NAME }}auroraserverlesspostgres${{ env.ENV }}
-          DBSecretARN=${{ env.DBSECRETARN }}
-
+          
           EOF
+          cat config/cfn.params
 
       
       - name: Create additional cloudformation tags for stack deployment
