@@ -112,18 +112,18 @@ Conditions:
   HasNotDBSnapshotIdentifier: !Equals [!Ref DBSnapshotIdentifier, '']
   HasDBSnapshotIdentifier: !Not [!Condition HasNotDBSnapshotIdentifier]
 Resources:
-  # RecordSet:
-  #   Type: 'AWS::Route53::RecordSet'
-  #   Properties:
-  #     HostedZoneId: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneId-${Env}'}
-  #     Name: !Sub
-  #     - '${SubDomainNameWithDot}${HostedZoneName}'
-  #     - SubDomainNameWithDot: !Ref SubDomainNameWithDot
-  #       HostedZoneName: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneName-${Env}'}
-  #     ResourceRecords:
-  #     - !GetAtt 'DBCluster.Endpoint.Address'
-  #     TTL: 60
-  #     Type: CNAME
+  RecordSet:
+    Type: 'AWS::Route53::RecordSet'
+    Properties:
+      HostedZoneId: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneId-${Env}'}
+      Name: !Sub
+      - '${SubDomainNameWithDot}${HostedZoneName}'
+      - SubDomainNameWithDot: !Ref SubDomainNameWithDot
+        HostedZoneName: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneName-${Env}'}
+      ResourceRecords:
+      - !GetAtt 'DBCluster.Endpoint.Address'
+      TTL: 60
+      Type: CNAME
   DBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
     Properties:
