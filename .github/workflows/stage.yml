@@ -70,6 +70,12 @@ jobs:
       #     extra_args: --fail-on-warnings -o json --blacklist-path .cfn_nag_blacklist.yml
 
 
+      - name: Extract cloudformation export variables 
+        run: |
+          export DBARN=${{ env.STACK_NAME }}-DB-${{ env.ENV }}
+          echo "DBSECRETARN="$(aws cloudformation list-exports --query "Exports[?Name==\`$DBSECRETARN\`].Value" --no-paginate --output text) >> $GITHUB_ENV
+
+
       - name: Create additional cloudformation parameters for stack deployment
         run: |
           cat >> config/cfn.params <<EOF 
@@ -78,6 +84,7 @@ jobs:
           CFNS3BucketName=${{ env.CFNS3BucketName }}
           CFNS3BucketRegion=ap-southeast-2
           DBName=${{ env.STACK_NAME }}auroraserverlesspostgres${{ env.ENV }}
+          DBSecretARN=${{ env.DBSECRETARN }}
 
           EOF
 

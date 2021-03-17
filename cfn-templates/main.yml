@@ -122,6 +122,12 @@ Parameters:
     MinValue: 1
     MaxValue: 35
     Default: 30
+  DBSecretARN:
+    AllowedPattern: arn:aws:secretsmanager:.*
+    ConstraintDescription: Only valid secret manager ARN allowed
+    Description: 'The DB secret ARN to retrieve from secret manager'
+    Type: String
+    NoEcho: true
   DBMasterUsername:
     Description: 'The master user name for the DB instance (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
     Type: 'String'
@@ -217,3 +223,4 @@ Resources:
         MinCapacity: !Ref 'MinCapacity'
         SecondsUntilAutoPause: !Ref 'SecondsUntilAutoPause'
         EngineVersion: !Ref 'AuroraEngineVersion'
+        DBSecretARN: !Ref 'DBSecretARN'
