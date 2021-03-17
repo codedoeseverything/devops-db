@@ -72,7 +72,7 @@ jobs:
 
       - name: Extract cloudformation export variables 
         run: |
-          export DBARN=${{ env.STACK_NAME }}-DB-${{ env.ENV }}
+          export DBARN=beta-DB-stage
           echo "DBSecretARN="$(aws cloudformation list-exports --query "Exports[?Name==\`$DBARN\`].Value" --no-paginate --output text) >> config/cfn.params
 
 
