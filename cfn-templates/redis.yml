@@ -138,12 +138,12 @@ Resources:
     Type: 'AWS::Route53::RecordSet'
     Properties:
       HostedZoneId:
-        'Fn::ImportValue': !Sub '${ParentZoneStack}-HostedZoneId'
+        'Fn::ImportValue': !Sub '${StackName}-PrivateHostedZoneID-{Env}'
       Name: !Sub
       - '${SubDomainName}.${HostedZoneName}'
       - SubDomainName: !Ref SubDomainName
         HostedZoneName:
-          'Fn::ImportValue': !Sub '${ParentZoneStack}-HostedZoneName'
+          'Fn::ImportValue': !Sub '${StackName}-PrivateHostedZoneName-{Env}'
       ResourceRecords:
       - !GetAtt 'ReplicationGroup.PrimaryEndPoint.Address'
       TTL: 60

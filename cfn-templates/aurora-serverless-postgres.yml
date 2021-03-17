@@ -115,11 +115,11 @@ Resources:
   RecordSet:
     Type: 'AWS::Route53::RecordSet'
     Properties:
-      HostedZoneId: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneId-${Env}'}
+      HostedZoneId: {'Fn::ImportValue': !Sub '${StackName}-PrivateHostedZoneID-${Env}'}
       Name: !Sub
       - '${SubDomainNameWithDot}${HostedZoneName}'
       - SubDomainNameWithDot: !Ref SubDomainNameWithDot
-        HostedZoneName: {'Fn::ImportValue': !Sub '${StackName}-HostedZoneName-${Env}'}
+        HostedZoneName: {'Fn::ImportValue': !Sub '${StackName}-PrivateHostedZoneName-${Env}'}
       ResourceRecords:
       - !GetAtt 'DBCluster.Endpoint.Address'
       TTL: 60
