@@ -58,6 +58,7 @@ Parameters:
     Type: 'String'
     Default: ''
     MaxLength: 128
+    NoEcho: true
   SnapshotRetentionLimit:
     Description: 'The number of days for which ElastiCache retains automatic snapshots before deleting them (set to 0 to disable backups).'
     Type: Number
