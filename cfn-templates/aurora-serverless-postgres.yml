@@ -33,10 +33,6 @@ Parameters:
     Description: 'Optional identifier for the DB cluster snapshot from which you want to restore (leave blank to create an empty cluster).'
     Type: String
     Default: ''
-  DBName:
-    Description: 'Name of the database (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: String
-    Default: ''
   DBBackupRetentionPeriod:
     Description: 'The number of days to keep snapshots of the cluster.'
     Type: Number
@@ -49,15 +45,6 @@ Parameters:
     Description: 'The DB secret ARN to retrieve from secret manager'
     Type: String
     NoEcho: true
-  DBMasterUsername:
-    Description: 'The master user name for the DB instance (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: 'String'
-    Default: master
-  DBMasterUserPassword:
-    Description: 'The master password for the DB instance (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: String
-    NoEcho: true
-    Default: ''
   SubDomainNameWithDot:
     Description: 'Name that is used to create the DNS entry with trailing dot, e.g. §{SubDomainNameWithDot}§{HostedZoneName}. Leave blank for naked (or apex and bare) domain. Requires ParentZoneStack parameter!'
     Type: String
@@ -144,7 +131,7 @@ Resources:
     Type: 'AWS::RDS::DBCluster'
     Properties:
       BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
-      DatabaseName: !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:dbname}}' ]]
+      DatabaseName: !If [HasDBSnapshotIdentifier, !Ref 'AWS::NoValue', !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:dbname}}' ]]]
       DBClusterParameterGroupName: !Ref DBClusterParameterGroup
       DBSubnetGroupName: !Ref DBSubnetGroup
       EnableHttpEndpoint: !Ref EnableDataApi
@@ -153,8 +140,6 @@ Resources:
       EngineVersion: !Ref EngineVersion
       MasterUsername: !If [HasDBSnapshotIdentifier, !Ref 'AWS::NoValue', !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:username}}' ]]]
       MasterUserPassword: !If [HasDBSnapshotIdentifier, !Ref 'AWS::NoValue', !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:password}}' ]]]
-      # MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:username}}' ]]
-      # MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:password}}' ]]
       # PreferredBackupWindow: !Ref PreferredBackupWindow TODO re-enable as soon as CloudFormation bug ix fixed
       # PreferredMaintenanceWindow: !Ref PreferredMaintenanceWindow TODO re-enable as soon as CloudFormation bug ix fixed
       ScalingConfiguration:

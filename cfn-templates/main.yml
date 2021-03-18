@@ -112,10 +112,6 @@ Parameters:
     Description: 'Optional identifier for the DB cluster snapshot from which you want to restore (leave blank to create an empty cluster).'
     Type: String
     Default: ''
-  DBName:
-    Description: 'Name of the database (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: String
-    Default: ''
   DBBackupRetentionPeriod:
     Description: 'The number of days to keep snapshots of the cluster.'
     Type: Number
@@ -128,15 +124,6 @@ Parameters:
     Description: 'The DB secret ARN to retrieve from secret manager'
     Type: String
     NoEcho: true
-  DBMasterUsername:
-    Description: 'The master user name for the DB instance (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: 'String'
-    Default: master
-  DBMasterUserPassword:
-    Description: 'The master password for the DB instance (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: String
-    NoEcho: true
-    Default: ''
   SubDomainNameWithDot:
     Description: 'Name that is used to create the DNS entry with trailing dot, e.g. §{SubDomainNameWithDot}§{HostedZoneName}. Leave blank for naked (or apex and bare) domain. Requires ParentZoneStack parameter!'
     Type: String
@@ -188,7 +175,7 @@ Resources:
   RedisStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/cfn-templates/redis.yml'
+      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/redis.yml'
       Parameters:
         StackName: !Ref 'StackName'
         Env: !Ref 'Env'
@@ -207,15 +194,12 @@ Resources:
   AuroraServerlessPostgresStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/cfn-templates/aurora-serverless-postgres.yml'
+      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/aurora-serverless-postgres.yml'
       Parameters:
         StackName: !Ref 'StackName'
         Env: !Ref 'Env'
         DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
-        DBName: !Ref 'DBName' # beta-devops-db-stage-auroraserverlesspo-dbcluster-1gjgqjwgbbcab
         DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
-        DBMasterUsername: !Ref 'DBMasterUsername'
-        DBMasterUserPassword: !Ref 'DBMasterUserPassword'
         SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
         EnableDataApi: !Ref 'EnableDataApi'
         AutoPause: !Ref 'AutoPause'

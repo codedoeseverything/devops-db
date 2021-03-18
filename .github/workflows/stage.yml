@@ -1,9 +1,13 @@
-# GitHub Actions WorkFlow Name
-
+################################################
+#  GITHUB ACTION WORKFLOW NAME
+################################################
 name: Release to Staging environment
 
-#Event Trigger for this Workflow
 
+
+################################################
+#  GITHUB ACTION EVENT TRIGGER
+################################################
 on:
   workflow_dispatch:
   push:
@@ -11,15 +15,20 @@ on:
     branches: [ 'develop' ]
     
 
-#Jobs to perform based on event occurred
- 
+
+################################################
+#  GITHUB ACTION JOBS
+################################################
 jobs:
   release-stage:
     name: release-stage
     runs-on: ubuntu-latest
 
-    #Global Env variables declare here
-    
+
+
+################################################
+#  GITHUB ACTIONS GLOBAL ENV VARIABLES  
+################################################
     env:
       REGION : ap-southeast-2
       ENV : stage # Valid values are sandbox,stage,live only
@@ -28,19 +37,28 @@ jobs:
       CFNS3BucketName: devops-cfn-templates1
 
 
-    # Steps to execute in this job
+
+################################################
+#  GITHUB REPO CHECKOUT 
+################################################
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
 
+################################################
+#  PYTHON ENV  
+################################################
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
 
-          
+
+################################################
+#  PYTHON MODULES CACHE  
+################################################
       - name: Cache Python dependencies
         uses: actions/cache@v2
         id: cache-python
@@ -52,6 +70,9 @@ jobs:
             ${{ runner.os }}-
 
 
+################################################
+#  PYTHON MODULES INSTALL  
+################################################
       - name: Install Python dependencies
         if: steps.cache-python.outputs.cache-hit != 'true'
         run: |
@@ -59,72 +80,102 @@ jobs:
           pip install -r requirements.txt
 
 
-      # - name: Run cloudformation template Lint analysis test using cfn-lint
-      #   uses: docker://ghcr.io/scottbrenner/cfn-lint-action:master
+################################################
+#  CLOUDFORMATION LINT ANALYSIS TEST 
+################################################
+      - name: Run cloudformation template Lint analysis test using cfn-lint
+        uses: docker://ghcr.io/scottbrenner/cfn-lint-action:master
           
 
-      # - name: Run cloudformation template static analysis test using cfn-nag
-      #   uses: stelligent/cfn_nag@master
-      #   with:
-      #     input_path: cfn-templates
-      #     extra_args: --fail-on-warnings -o json --blacklist-path .cfn_nag_blacklist.yml
-      
-      - name: Configure AWS credentials from ${{ env.STACK_NAME }} account in ${{ env.REGION }} region
+################################################
+#  CLOUDFORMATION STATIC ANALYSIS TEST  
+################################################
+      - name: Run cloudformation template static analysis test using cfn-nag
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: cfn-templates
+          extra_args: --fail-on-warnings -o json --blacklist-path .cfn_nag_blacklist.yml
+
+
+################################################
+#  AWS CLI CONFIGURATION  
+################################################ 
+      - name: Configure AWS credentials from $STACK_NAME account in $REGION region
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.DEVOPS_AWS_KEY }}
           aws-secret-access-key: ${{ secrets.DEVOPS_SECRET_KEY }}
           aws-region: ${{ env.REGION }}
-          
-
-      - name: Extract cloudformation export variables 
-        run: |
-          export DBARN=${{ env.STACK_NAME }}-DB-${{ env.ENV }}
-          echo "DBSecretARN="$(aws cloudformation list-exports --query "Exports[?Name==\`$DBARN\`].Value" --no-paginate --output text) >> config/cfn.params
 
 
-      - name: Create additional cloudformation parameters for stack deployment
-        run: |
-          cat >> config/cfn.params <<EOF 
-          StackName=${{ env.STACK_NAME }}
-          Env=${{ env.ENV }}
-          CFNS3BucketName=${{ env.CFNS3BucketName }}
-          CFNS3BucketRegion=ap-southeast-2
-          DBName=${{ env.STACK_NAME }}auroraserverlesspostgres${{ env.ENV }}
-          
-          EOF
-          cat config/cfn.params
 
-      
+####################################################
+#  CLOUDFORMATION ADDITIONAL TAG; KEY=VALUE FORMAT
+####################################################      
       - name: Create additional cloudformation tags for stack deployment
         run: |
           cat >> config/cfn.tags <<EOF 
-          StackName=${{ env.STACK_NAME }}
-          Env=${{ env.ENV }}
-          RootStack=${{ env.SUBDOMAIN }}
+          StackName=$STACK_NAME
+          Env=$ENV
+          RootStack=$SUBDOMAIN
           EOF
          
 
-      - name: Convert JSON format cloudformation parameters and tags for stack deployment
+################################################
+#  CLOUDFORMATION ADDITIONAL TAG FORMATTING
+################################################ 
+      - name: Convert JSON format cloudformation tags for stack deployment
         run: |
-          python3 scripts/cfn-param-json-convert.py config/cfn.params
           python3 scripts/cfn-param-json-convert.py config/cfn.tags
 
 
+
+#############################################################################
+#  CLOUDFORMATION ADDITIONAL PARAMETERS (SECRETS INCLUDED); KEY=VALUE FORMAT
+#############################################################################
+      - name: Create additional cloudformation parameters for stack deployment
+        run: |
+          export DBARN=$STACK_NAME-DB-$ENV
+          echo "DBSecretARN="$(aws cloudformation list-exports --query "Exports[?Name==\`$DBARN\`].Value" --no-paginate --output text) >> config/cfn.params
+          cat >> config/cfn.params <<EOF 
+          StackName=$STACK_NAME
+          Env=$ENV
+          CFNS3BucketName=$CFNS3BucketName
+          CFNS3BucketRegion=ap-southeast-2
+          EOF
+
       
 
+##########################################################
+#  CLOUDFORMATION ADDITIONAL PARAMETERS FORMATTING
+########################################################## 
+      - name: Convert JSON format cloudformation parameters for stack deployment
+        run: |
+          python3 scripts/cfn-param-json-convert.py config/cfn.params
 
 
+
+##########################################################
+#  AWS S3 SYNC - CLOUDFORMATION TEMPLATES 
+##########################################################
       - name: AWS S3 Sync operation
         run: |
-          aws s3 sync cfn-templates/ s3://${{env.CFNS3BucketName}}/${{env.STACK_NAME}}/cfn-templates --delete
+          aws s3 sync cfn-templates/ s3://$CFNS3BucketName/$STACK_NAME/$REGION/cfn-templates --delete
 
 
-      - name: Create or Update cloudformation templates from ${{ env.STACK_NAME }} AWS account in ${{ env.REGION }} region
+
+##########################################################
+#  CLOUDFORMATION DEPLOYMENT
+########################################################## 
+      - name: Create or Update cloudformation templates from $STACK_NAME AWS account in $REGION region
         run: |
-          python3 scripts/cfn-create-update.py ${{ env.STACK_NAME }}-${{ env.SUBDOMAIN }}-${{env.ENV}} cfn-templates/main.yml config/cfn-params.json config/cfn-tags.json
-       
+          python3 scripts/cfn-deploy.py $STACK_NAME-$SUBDOMAIN-$ENV cfn-templates/main.yml config/cfn-params.json config/cfn-tags.json
 
+
+
+##########################################################
+#  SLACK NOTIFICATION
+##########################################################       
       - name: Slack Notification
         if: always() # Pick up events even if the job fails or is canceled.
         uses: 8398a7/action-slack@v3
@@ -136,7 +187,7 @@ jobs:
           author_name: ${{ env.SUBDOMAIN }} deployed to ${{ env.ENV }} environemnt in ${{ env.STACK_NAME }} AWS account
           mention: 'here'
           if_mention: failure,cancelled
-          job_name: release-stage # Match the name above.
+          job_name: centralized # Match the name above.
           fields: repo,commit,eventName,ref,workflow,message,author,job,took
           custom_payload: |
             {
