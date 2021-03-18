@@ -142,6 +142,7 @@ jobs:
           CFNS3BucketName=$CFNS3BucketName
           CFNS3BucketRegion=ap-southeast-2
           DBSecretARN=$(aws cloudformation list-exports --query "Exports[?Name==\`$DBARN\`].Value" --no-paginate --output text)
+          
           EOF
           cat config/cfn.params
 
