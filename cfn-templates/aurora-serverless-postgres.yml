@@ -124,7 +124,7 @@ Resources:
       Description: !Sub '${StackName}-AuroraServerlessPostgresDBClusterParameterGroup-${Env}'
       Family: !FindInMap [EngineVersionMap, !Ref EngineVersion, ClusterParameterGroupFamily]
       Parameters:
-        client_encoding: 'UTF8'
+        client_encoding: 'UTFRecordSet8'
   DBCluster:
     DeletionPolicy: Snapshot # default
     UpdateReplacePolicy: Snapshot
@@ -176,3 +176,8 @@ Outputs:
     Value: !GetAtt 'DBCluster.Endpoint.Address'
     Export:
       Name: !Sub '${StackName}-AuroraServerlessPostgresDNSName-${Env}'
+  Route53RecordRDS:
+    Description: 'The connection endpoint for the DB cluster via Route53 record.'
+    Value: !Ref 'RecordSet'
+    Export:
+      Name: !Sub '${StackName}-Route53RecordRDS-${Env}'
