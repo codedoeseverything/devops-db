@@ -144,11 +144,11 @@ Resources:
       - '${SubDomainName}.${HostedZoneName}'
       - SubDomainName: !Ref SubDomainName
         HostedZoneName:
-          'Fn:Route53RecordRDS:
-    Description: 'The connection endpoint for the DB cluster via Route53 record.'
-    Value: !Ref 'RecordSet'
-    Export:
-      Name: !Sub '${StackName}-Route53RecordRDS-${Env}'AME
+          'Fn::ImportValue': !Sub '${StackName}-PrivateHostedZoneName-${Env}'
+      ResourceRecords:
+      - !GetAtt 'ReplicationGroup.PrimaryEndPoint.Address'
+      TTL: 60
+      Type: CNAME
   CacheParameterGroup:
     Type: 'AWS::ElastiCache::ParameterGroup'
     Properties:
@@ -405,7 +405,7 @@ Outputs:
     Value: !GetAtt 'ReplicationGroup.PrimaryEndPoint.Port'
     Export:
       Name: !Sub '${StackName}-RedisPrimaryEndPointPort-${Env}'
-  Route53RecordRDS:
+  Route53RecordRedis:
     Description: 'The connection endpoint for the Redis cluster via Route53 record.'
     Value: !Ref 'RecordSet'
     Export:
