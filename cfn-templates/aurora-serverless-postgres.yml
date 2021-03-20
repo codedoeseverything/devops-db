@@ -124,7 +124,7 @@ Resources:
       Description: !Sub '${StackName}-AuroraServerlessPostgresDBClusterParameterGroup-${Env}'
       Family: !FindInMap [EngineVersionMap, !Ref EngineVersion, ClusterParameterGroupFamily]
       Parameters:
-        client_encoding: 'UTFRecordSet8'
+        client_encoding: 'UTF8'
   DBCluster:
     DeletionPolicy: Snapshot # default
     UpdateReplacePolicy: Snapshot

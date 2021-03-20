@@ -17,5 +17,7 @@ AutoPause=true
 MaxCapacity=2
 MinCapacity=2
 SecondsUntilAutoPause=600
-AuroraEngineVersion=10.7
+AuroraEngineVersion=10.12
+
+
 
