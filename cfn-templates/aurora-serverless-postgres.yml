@@ -176,8 +176,8 @@ Outputs:
     Value: !GetAtt 'DBCluster.Endpoint.Address'
     Export:
       Name: !Sub '${StackName}-AuroraServerlessPostgresDNSName-${Env}'
-  Route53RecordRDS:
-    Description: 'The connection endpoint for the DB cluster via Route53 record.'
-    Value: !Ref 'RecordSet'
-    Export:
-      Name: !Sub '${StackName}-Route53RecordRDS-${Env}'
+  # Route53RecordRDS:
+  #   Description: 'The connection endpoint for the DB cluster via Route53 record.'
+  #   Value: !Ref 'RecordSet'
+  #   Export:
+  #     Name: !Sub '${StackName}-Route53RecordRDS-${Env}'

@@ -173,11 +173,11 @@ Resources:
       ReplicationGroupDescription: !Sub '${StackName}-RedisReplicationGroup-${Env}'
       ReplicationGroupId: !Sub '${StackName}-RedisElastiCacheCluster-${Env}'
       AtRestEncryptionEnabled: true
-      AuthToken: !If [HasAuthToken, !Ref AuthToken, !Ref 'AWS::NoValue']
-      AutomaticFailoverEnabled: !If [HasAutomaticFailoverEnabled, true, false]
-      MultiAZEnabled: !If [HasAutomaticFailoverEnabled, true, false]
-      CacheNodeType: !Ref CacheNodeType
-      CacheParameterGroupName: !Ref CacheParameterGroup
+      AuthToken: !IfRoute53RecordRDS:
+  #   Description: 'The connection endpoint for the DB cluster via Route53 record.'
+  #   Value: !Ref 'RecordSet'
+  #   Export:
+  #     Name: !Sub '${StackName}-Route53RecordRDS-${Env}'GroupName: !Ref CacheParameterGroup
       CacheSubnetGroupName: !Ref CacheSubnetGroupName
       Engine: redis
       EngineVersion: !Ref EngineVersion
@@ -405,8 +405,8 @@ Outputs:
     Value: !GetAtt 'ReplicationGroup.PrimaryEndPoint.Port'
     Export:
       Name: !Sub '${StackName}-RedisPrimaryEndPointPort-${Env}'
-  Route53RecordRedis:
-    Description: 'The connection endpoint for the Redis cluster via Route53 record.'
-    Value: !Ref 'RecordSet'
-    Export:
-      Name: !Sub '${StackName}-Route53RecordRedis-${Env}'
+  # Route53RecordRedis:
+  #   Description: 'The connection endpoint for the Redis cluster via Route53 record.'
+  #   Value: !Ref 'RecordSet'
+  #   Export:
+  #     Name: !Sub '${StackName}-Route53RecordRedis-${Env}'
