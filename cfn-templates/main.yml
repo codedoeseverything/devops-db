@@ -169,7 +169,32 @@ Parameters:
     Default: '10.7'
     AllowedValues: ['10.7','10.12'] 
     # aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`serverless`)]'
+  RDSEngineVersion:
+    Description: 'Aurora engine and version'
+    Type: String
+    AllowedValues:
+    - 'aurora-postgresql-10.14' # aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`provisioned`)].EngineVersion'
+    - 'aurora-postgresql-12.4'
+    Default: aurora-postgresql-12.4
+  DBInstanceClass:
+    Description: 'The instance type of database server (see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html).'
+    Type: String
+    Default: 'db.t2.small'
+  ISRDSServerless:
+    Description: 'True if we want Aurora RDS Serverless.'
+    Type: String
+    Default: true
+    AllowedValues:
+    - true
+    - false
 
+Conditions:
+  RDSServerless: !Equals
+      - !Ref 'ISRDSServerless'
+      - 'true'
+  NonRDSServerless: !Equals
+      - !Ref 'ISRDSServerless'
+      - 'false'
 
 Resources:
 
@@ -193,6 +218,7 @@ Resources:
         DatabaseMemoryUsagePercentageThreshold: !Ref 'DatabaseMemoryUsagePercentageThreshold'
 
   AuroraServerlessPostgresStack:
+    Condition: RDSServerless
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/aurora-serverless-postgres.yml'
@@ -208,4 +234,19 @@ Resources:
         MinCapacity: !Ref 'MinCapacity'
         SecondsUntilAutoPause: !Ref 'SecondsUntilAutoPause'
         EngineVersion: !Ref 'AuroraEngineVersion'
+        DBSecretARN: !Ref 'DBSecretARN'
+
+  AuroraPostgresStack:
+    Condition: NonRDSServerless
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/aurora-postgres.yml'
+      Parameters:
+        StackName: !Ref 'StackName'
+        Env: !Ref 'Env'
+        DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
+        DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
+        SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
+        Engine: !Ref 'RDSEngineVersion'
+        DBInstanceClass: !Ref DBInstanceClass
         DBSecretARN: !Ref 'DBSecretARN'

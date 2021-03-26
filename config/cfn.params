@@ -18,6 +18,9 @@ MaxCapacity=2
 MinCapacity=2
 SecondsUntilAutoPause=600
 AuroraEngineVersion=10.12
+RDSEngineVersion=aurora-postgresql-12.4
+DBInstanceClass=db.t2.small
+ISRDSServerless=false
 
 
 

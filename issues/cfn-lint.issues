@@ -1,3 +1,0 @@
-E3002 Property Resources/ReplicationGroup/Properties/AuthToken has an illegal function Fn::IfRoute53RecordRDS:
-cfn-templates/redis.yml:176:7
-

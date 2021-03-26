@@ -9,6 +9,15 @@
     }
   },
   {
+    "filename": "cfn-templates/aurora-postgres.yml",
+    "file_results": {
+      "failure_count": 0,
+      "violations": [
+
+      ]
+    }
+  },
+  {
     "filename": "cfn-templates/main.yml",
     "file_results": {
       "failure_count": 0,

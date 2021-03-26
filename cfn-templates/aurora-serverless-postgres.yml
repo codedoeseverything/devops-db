@@ -48,7 +48,7 @@ Parameters:
   SubDomainNameWithDot:
     Description: 'Name that is used to create the DNS entry with trailing dot, e.g. §{SubDomainNameWithDot}§{HostedZoneName}. Leave blank for naked (or apex and bare) domain. Requires ParentZoneStack parameter!'
     Type: String
-    Default: 'aurora.'
+    Default: 'aurora-serverless.'
   PreferredBackupWindow:
     Description: 'IGNORED BECAUSE OF A BUG IN CLOUDFORMATION! VALUE WILL APPLY IN THE FUTURE! The daily time range in UTC during which you want to create automated backups.' # TODO remove uppercase warning
     Type: String
@@ -132,7 +132,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub '${StackName}-AuroraDBCluster-${Env}'
+          Value: !Sub '${StackName}-PostgresServerless-${Env}'
       BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
       DatabaseName: !If [HasDBSnapshotIdentifier, !Ref 'AWS::NoValue', !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:dbname}}' ]]]
       DBClusterParameterGroupName: !Ref DBClusterParameterGroup
@@ -173,7 +173,7 @@ Outputs:
     Description: 'The name of the cluster.'
     Value: !Ref DBCluster
     Export:
-      Name: !Sub '${StackName}-AuroraServerlessPostgresClusterName-${Env}'
+      Name: !Sub '${StackName}-AuroraPostgresServerless-${Env}'
   DNSName:
     Description: 'The connection endpoint for the DB cluster.'
     Value: !GetAtt 'DBCluster.Endpoint.Address'
@@ -183,5 +183,5 @@ Outputs:
     Description: 'The connection endpoint for the DB cluster via Route53 record.'
     Value: !Ref 'RecordSet'
     Export:
-      Name: !Sub '${StackName}-Route53RecordRDS-${Env}'
+      Name: !Sub '${StackName}-RDSServerlessEndpoint-${Env}'
 
