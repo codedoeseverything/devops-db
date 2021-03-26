@@ -33,7 +33,7 @@ Parameters:
     Description: 'Aurora engine and version'
     Type: String
     AllowedValues:
-    - 'aurora-postgresql-10.14' # aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`provisioned`)].EngineVersion'
+    - 'aurora-postgresql-10.7' # aws rds describe-db-engine-versions --engine aurora-postgresql --query 'DBEngineVersions[?contains(SupportedEngineModes,`provisioned`)].EngineVersion'
     - 'aurora-postgresql-12.4'
     Default: aurora-postgresql-12.4
   DBSnapshotIdentifier:
@@ -43,7 +43,7 @@ Parameters:
   DBInstanceClass:
     Description: 'The instance type of database server (see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html).'
     Type: String
-    Default: 'db.t2.small'
+    Default: 'db.t3.medium'
   DBName:
     Description: 'Name of the database (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
     Type: String
@@ -78,9 +78,9 @@ Parameters:
     Default: 'sat:07:00-sat:07:30'
 Mappings:
   EngineMap:
-    'aurora-postgresql-10.14':
+    'aurora-postgresql-10.7':
       Engine: 'aurora-postgresql'
-      EngineVersion: '10.14'
+      EngineVersion: '10.7'
       Port: 5432
       ClusterParameterGroupFamily: 'aurora-postgresql10'
       ParameterGroupFamily: 'aurora-postgresql10'
