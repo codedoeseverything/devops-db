@@ -129,6 +129,10 @@ Parameters:
     Description: 'Name that is used to create the DNS entry with trailing dot, e.g. §{SubDomainNameWithDot}§{HostedZoneName}. Leave blank for naked (or apex and bare) domain. Requires ParentZoneStack parameter!'
     Type: String
     Default: 'aurora.'
+  ServerlessSubDomainNameWithDot:
+    Description: 'Name that is used to create the DNS entry with trailing dot, e.g. §{SubDomainNameWithDot}§{HostedZoneName}. Leave blank for naked (or apex and bare) domain. Requires ParentZoneStack parameter!'
+    Type: String
+    Default: 'aurora-serverless.'
   PreferredBackupWindow:
     Description: 'IGNORED BECAUSE OF A BUG IN CLOUDFORMATION! VALUE WILL APPLY IN THE FUTURE! The daily time range in UTC during which you want to create automated backups.' # TODO remove uppercase warning
     Type: String
@@ -246,7 +250,7 @@ Resources:
         Env: !Ref 'Env'
         DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
         DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
-        SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
+        SubDomainNameWithDot: !Ref 'ServerlessSubDomainNameWithDot'
         Engine: !Ref 'RDSEngineVersion'
         DBInstanceClass: !Ref DBInstanceClass
         DBSecretARN: !Ref 'DBSecretARN'
