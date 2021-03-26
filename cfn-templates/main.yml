@@ -231,7 +231,7 @@ Resources:
         Env: !Ref 'Env'
         DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
         DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
-        SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
+        SubDomainNameWithDot: !Ref 'ServerlessSubDomainNameWithDot'
         EnableDataApi: !Ref 'EnableDataApi'
         AutoPause: !Ref 'AutoPause'
         MaxCapacity: !Ref 'MaxCapacity'
@@ -250,7 +250,7 @@ Resources:
         Env: !Ref 'Env'
         DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
         DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
-        SubDomainNameWithDot: !Ref 'ServerlessSubDomainNameWithDot'
+        SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
         Engine: !Ref 'RDSEngineVersion'
         DBInstanceClass: !Ref DBInstanceClass
         DBSecretARN: !Ref 'DBSecretARN'
