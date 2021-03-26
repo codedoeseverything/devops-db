@@ -217,36 +217,36 @@ Resources:
         CPUUtilizationThreshold: !Ref 'CPUUtilizationThreshold'
         DatabaseMemoryUsagePercentageThreshold: !Ref 'DatabaseMemoryUsagePercentageThreshold'
 
-  # AuroraServerlessPostgresStack:
-  #   Condition: RDSServerless
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/aurora-serverless-postgres.yml'
-  #     Parameters:
-  #       StackName: !Ref 'StackName'
-  #       Env: !Ref 'Env'
-  #       DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
-  #       DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
-  #       SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
-  #       EnableDataApi: !Ref 'EnableDataApi'
-  #       AutoPause: !Ref 'AutoPause'
-  #       MaxCapacity: !Ref 'MaxCapacity'
-  #       MinCapacity: !Ref 'MinCapacity'
-  #       SecondsUntilAutoPause: !Ref 'SecondsUntilAutoPause'
-  #       EngineVersion: !Ref 'AuroraEngineVersion'
-  #       DBSecretARN: !Ref 'DBSecretARN'
+  AuroraServerlessPostgresStack:
+    Condition: RDSServerless
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/aurora-serverless-postgres.yml'
+      Parameters:
+        StackName: !Ref 'StackName'
+        Env: !Ref 'Env'
+        DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
+        DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
+        SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
+        EnableDataApi: !Ref 'EnableDataApi'
+        AutoPause: !Ref 'AutoPause'
+        MaxCapacity: !Ref 'MaxCapacity'
+        MinCapacity: !Ref 'MinCapacity'
+        SecondsUntilAutoPause: !Ref 'SecondsUntilAutoPause'
+        EngineVersion: !Ref 'AuroraEngineVersion'
+        DBSecretARN: !Ref 'DBSecretARN'
 
-  # AuroraPostgresStack:
-  #   Condition: NonRDSServerless
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/aurora-postgres.yml'
-  #     Parameters:
-  #       StackName: !Ref 'StackName'
-  #       Env: !Ref 'Env'
-  #       DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
-  #       DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
-  #       SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
-  #       Engine: !Ref 'RDSEngineVersion'
-  #       DBInstanceClass: !Ref DBInstanceClass
-  #       DBSecretARN: !Ref 'DBSecretARN'
+  AuroraPostgresStack:
+    Condition: NonRDSServerless
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/aurora-postgres.yml'
+      Parameters:
+        StackName: !Ref 'StackName'
+        Env: !Ref 'Env'
+        DBSnapshotIdentifier: !Ref 'DBSnapshotIdentifier'
+        DBBackupRetentionPeriod: !Ref 'DBBackupRetentionPeriod'
+        SubDomainNameWithDot: !Ref 'SubDomainNameWithDot'
+        Engine: !Ref 'RDSEngineVersion'
+        DBInstanceClass: !Ref DBInstanceClass
+        DBSecretARN: !Ref 'DBSecretARN'
