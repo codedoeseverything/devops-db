@@ -22,3 +22,4 @@ AuroraEngineVersion=10.12
 RDSEngineVersion=aurora-postgresql-12.4
 DBInstanceClass=db.t3.medium
 ISRDSServerless=true
+
