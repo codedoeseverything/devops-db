@@ -23,7 +23,7 @@ AuroraRDSEngineVersion=aurora-postgresql-12.4
 DBInstanceClass=db.t3.medium
 ISRDSServerless=RDS
 DBAllocatedStorage=50
-RDSDBInstanceClass=db.t2.micro
+RDSDBInstanceClass=db.t3.medium
 RDSEngineVersion=12.4
 
 
