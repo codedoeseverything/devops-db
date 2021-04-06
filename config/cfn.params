@@ -11,15 +11,21 @@ CPUUtilizationThreshold=70
 DatabaseMemoryUsagePercentageThreshold=70
 DBSnapshotIdentifier=
 DBBackupRetentionPeriod=1
-SubDomainNameWithDot=aurora.
+SubDomainNameWithDot=db.
 ServerlessSubDomainNameWithDot=aurora-serverless.
 EnableDataApi=false
 AutoPause=true
 MaxCapacity=2
 MinCapacity=2
 SecondsUntilAutoPause=600
-AuroraEngineVersion=10.12
-RDSEngineVersion=aurora-postgresql-12.4
+AuroraServerlessEngineVersion=10.12
+AuroraRDSEngineVersion=aurora-postgresql-12.4
 DBInstanceClass=db.t3.medium
-ISRDSServerless=true
+ISRDSServerless=RDS
+DBAllocatedStorage=50
+RDSDBInstanceClass=db.t2.micro
+RDSEngineVersion=12.4
+
+
+
 

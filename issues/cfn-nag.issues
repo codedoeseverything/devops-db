@@ -1,5 +1,14 @@
 [
   {
+    "filename": "cfn-templates/rds-postgres.yml",
+    "file_results": {
+      "failure_count": 0,
+      "violations": [
+
+      ]
+    }
+  },
+  {
     "filename": "cfn-templates/aurora-serverless-postgres.yml",
     "file_results": {
       "failure_count": 0,

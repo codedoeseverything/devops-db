@@ -44,10 +44,6 @@ Parameters:
     Description: 'The instance type of database server (see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html).'
     Type: String
     Default: 'db.t3.medium'
-  DBName:
-    Description: 'Name of the database (ignored when DBSnapshotIdentifier is set, value used from snapshot).'
-    Type: String
-    Default: ''
   DBBackupRetentionPeriod:
     Description: 'The number of days to keep snapshots of the cluster.'
     Type: Number
@@ -323,29 +319,34 @@ Outputs:
   StackName:
     Description: 'Stack name.'
     Value: !Sub '${AWS::StackName}'
+  DBNAME:
+    Description: 'The name of the database instance.'
+    Value: !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:dbname}}' ]]
+    Export: 
+      Name: !Sub '${StackName}-DBNAME-${Env}'
   ClusterName:
     Description: 'The name of the cluster.'
     Value: !Ref DBCluster
     Export:
       Name: !Sub '${StackName}-AuroraPostgres-${Env}'
-  DNSName:
+  AuroraDNSName:
     Description: 'The connection endpoint for the DB cluster.'
     Value: !GetAtt 'DBCluster.Endpoint.Address'
     Export:
       Name: !Sub '${StackName}-AuroraPostgresDNSName-${Env}'
-  ReadDNSName:
+  AuroraReadDNSName:
     Description: 'The reader endpoint for the DB cluster.'
     Value: !GetAtt 'DBCluster.ReadEndpoint.Address'
     Export:
       Name: !Sub '${StackName}-AuroraPostgresReadDNSName-${Env}'
-  Route53RecordRDS:
+  Route53Record:
     Description: 'The connection endpoint for the DB cluster via Route53 record.'
     Value: !Ref 'RecordSet'
     Export:
-      Name: !Sub '${StackName}-Route53RDSEndpoint-${Env}'
-  Route53RecordRDSRead:
+      Name: !Sub '${StackName}-Route53DBEndpoint-${Env}'
+  Route53RecordAuroraRead:
     Description: 'The read connection endpoint for the DB cluster via Route53 record.'
     Value: !Ref 'ReadRecordSet'
     Export:
-      Name: !Sub '${StackName}-Route53RDSReaderEndpoint-${Env}'
+      Name: !Sub '${StackName}-Route53RDSAuroraReaderEndpoint-${Env}'
   

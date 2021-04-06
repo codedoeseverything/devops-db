@@ -169,19 +169,24 @@ Outputs:
   StackName:
     Description: 'Stack name.'
     Value: !Sub '${AWS::StackName}'
+  DBNAME:
+    Description: 'The name of the database instance.'
+    Value: !Join ['', ['{{resolve:secretsmanager:', !Ref DBSecretARN, ':SecretString:dbname}}' ]]
+    Export: 
+      Name: !Sub '${StackName}-DBNAME-${Env}'
   ClusterName:
     Description: 'The name of the cluster.'
     Value: !Ref DBCluster
     Export:
       Name: !Sub '${StackName}-AuroraPostgresServerless-${Env}'
-  DNSName:
+  AuroraServerlessDNSName:
     Description: 'The connection endpoint for the DB cluster.'
     Value: !GetAtt 'DBCluster.Endpoint.Address'
     Export:
       Name: !Sub '${StackName}-AuroraServerlessPostgresDNSName-${Env}'
-  Route53RecordRDS:
+  Route53RecordAuroraServerless:
     Description: 'The connection endpoint for the DB cluster via Route53 record.'
     Value: !Ref 'RecordSet'
     Export:
-      Name: !Sub '${StackName}-RDSServerlessEndpoint-${Env}'
+      Name: !Sub '${StackName}-Route53DBEndpoint-${Env}'
 
