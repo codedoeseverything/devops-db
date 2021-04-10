@@ -221,24 +221,24 @@ Conditions:
 
 Resources:
 
-  RedisStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/redis.yml'
-      Parameters:
-        StackName: !Ref 'StackName'
-        Env: !Ref 'Env'
-        EngineVersion: !Ref 'RedisEngineVersion'
-        CacheNodeType: !Ref 'CacheNodeType'
-        TransitEncryption: !Ref 'TransitEncryption'
-        AuthToken: !Ref 'AuthToken'
-        SnapshotRetentionLimit: !Ref 'SnapshotRetentionLimit'
-        SnapshotName: !Ref 'SnapshotName'
-        SubDomainName: !Ref 'SubDomainName'
-        NumShards: !Ref 'NumShards'
-        NumReplicas: !Ref 'NumReplicas'
-        CPUUtilizationThreshold: !Ref 'CPUUtilizationThreshold'
-        DatabaseMemoryUsagePercentageThreshold: !Ref 'DatabaseMemoryUsagePercentageThreshold'
+  # RedisStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub 'https://${CFNS3BucketName}.s3.${CFNS3BucketRegion}.amazonaws.com/${StackName}/${CFNS3BucketRegion}/cfn-templates/redis.yml'
+  #     Parameters:
+  #       StackName: !Ref 'StackName'
+  #       Env: !Ref 'Env'
+  #       EngineVersion: !Ref 'RedisEngineVersion'
+  #       CacheNodeType: !Ref 'CacheNodeType'
+  #       TransitEncryption: !Ref 'TransitEncryption'
+  #       AuthToken: !Ref 'AuthToken'
+  #       SnapshotRetentionLimit: !Ref 'SnapshotRetentionLimit'
+  #       SnapshotName: !Ref 'SnapshotName'
+  #       SubDomainName: !Ref 'SubDomainName'
+  #       NumShards: !Ref 'NumShards'
+  #       NumReplicas: !Ref 'NumReplicas'
+  #       CPUUtilizationThreshold: !Ref 'CPUUtilizationThreshold'
+  #       DatabaseMemoryUsagePercentageThreshold: !Ref 'DatabaseMemoryUsagePercentageThreshold'
 
   AuroraServerlessPostgresStack:
     Condition: RDSServerless
